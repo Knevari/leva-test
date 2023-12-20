@@ -19,6 +19,7 @@ const sphere = {
 const playback = {
   currentFrame: 0,
   maxFrames: 100,
+  isPlaying: false,
 };
 
 const camera = {

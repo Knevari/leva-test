@@ -7,20 +7,29 @@ import {
 } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import useControlPanel from "./hooks/useControlPanel";
-import { Color, MeshStandardMaterial, PerspectiveCamera } from "three";
+import { Color, Mesh, MeshStandardMaterial, PerspectiveCamera } from "three";
 import { useRef } from "react";
 
 export function ControlPanel() {
   const three = useThree();
+  const sphereRef = useRef<Mesh>(null);
   const sphereMaterialRef = useRef<MeshStandardMaterial>(null);
 
   const {
-    controls: { general, sphere, playback, camera },
+    controls: { general, sphere, playback },
+    setters: { setPlaybackControls },
   } = useControlPanel({
     camera: three.camera as PerspectiveCamera,
+    onReset: () => sphereRef.current?.position.set(0, 0, 0),
   });
 
-  // useFrame((state, delta) => {});
+  useFrame((_, delta) => {
+    if (!sphereRef.current) return;
+    if (playback.isPlaying && playback.currentFrame < playback.maxFrames) {
+      sphereRef.current.position.x += delta;
+      setPlaybackControls({ currentFrame: playback.currentFrame + 1 });
+    }
+  });
 
   const onPointerOverSphere = () => {
     if (!sphereMaterialRef.current || !sphere.changeOnHover) return;
@@ -42,6 +51,7 @@ export function ControlPanel() {
       <PivotControls depthTest={false} visible={sphere.helper}>
         <Float enabled={sphere.float} speed={5} floatIntensity={3}>
           <mesh
+            ref={sphereRef}
             visible={sphere.visible}
             scale={sphere.scale}
             position-y={0}

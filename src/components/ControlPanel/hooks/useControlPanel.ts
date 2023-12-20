@@ -5,13 +5,19 @@ import { PerspectiveCamera } from "three";
 
 export interface ControlPanelHookArgs {
   camera?: PerspectiveCamera;
+  onReset?: () => void;
 }
 
-export default function useControlPanel({ camera }: ControlPanelHookArgs) {
+export default function useControlPanel({
+  camera,
+  onReset,
+}: ControlPanelHookArgs) {
   const resetToDefauts = useCallback(() => {
     setGeneralControls(defaultSettings.general);
     setSphereControls({ ...defaultSettings.sphere, scale: 1 });
     setCameraControls({ fov: defaultSettings.camera.fov.value });
+    setPlaybackControls(defaultSettings.playback);
+    onReset?.();
   }, []);
 
   const [generalControls, setGeneralControls] = useControls(() => ({
@@ -32,10 +38,10 @@ export default function useControlPanel({ camera }: ControlPanelHookArgs) {
         label: "play/pause",
         opts: {
           play: () => {
-            alert("Playing");
+            setPlaybackControls({ isPlaying: true });
           },
           pause: () => {
-            alert("Not Playing");
+            setPlaybackControls({ isPlaying: false });
           },
         },
       }),
