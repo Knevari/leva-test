@@ -3,15 +3,18 @@ import {
   MeshReflectorMaterial,
   OrbitControls,
   PivotControls,
+  SoftShadows,
   Text,
 } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import useControlPanel from "./hooks/useControlPanel";
-import { Color, Mesh, MeshStandardMaterial, PerspectiveCamera } from "three";
 import { useRef } from "react";
 
+import { Color, Mesh, MeshStandardMaterial, PerspectiveCamera } from "three";
+
+import useControlPanel from "./hooks/useControlPanel";
+
 export function ControlPanel() {
-  const three = useThree();
+  const { camera } = useThree();
   const sphereRef = useRef<Mesh>(null);
   const sphereMaterialRef = useRef<MeshStandardMaterial>(null);
 
@@ -19,52 +22,58 @@ export function ControlPanel() {
     controls: { general, sphere, playback },
     setters: { setPlaybackControls },
   } = useControlPanel({
-    camera: three.camera as PerspectiveCamera,
+    camera: camera as PerspectiveCamera,
     onReset: () => sphereRef.current?.position.set(0, 0, 0),
   });
 
   useFrame((_, delta) => {
     if (!sphereRef.current) return;
-    if (playback.isPlaying && playback.currentFrame < playback.maxFrames) {
+    if (
+      playback["Is Playing"] &&
+      playback["Current Frame"] < playback["Max Frames"]
+    ) {
       sphereRef.current.position.x += delta;
-      setPlaybackControls({ currentFrame: playback.currentFrame + 1 });
+      setPlaybackControls({ "Current Frame": playback["Current Frame"] + 1 });
     }
   });
 
-  const onPointerOverSphere = () => {
-    if (!sphereMaterialRef.current || !sphere.changeOnHover) return;
-    sphereMaterialRef.current.color = new Color("#FD1193");
-  };
-
-  const onPointerOutSphere = () => {
-    if (!sphereMaterialRef.current || !sphere.changeOnHover) return;
-    sphereMaterialRef.current.color = new Color("#E91242");
+  const changeSphereColor = (color: string) => {
+    if (!sphereMaterialRef.current || !sphere["Change on Hover"]) return;
+    sphereMaterialRef.current.color = new Color(color);
   };
 
   return (
     <>
       <OrbitControls makeDefault />
 
-      <ambientLight intensity={2} />
-      <pointLight position={[1, 2, 3]} intensity={4.5} />
+      <SoftShadows size={25} samples={17} focus={0} />
 
-      <PivotControls depthTest={false} visible={sphere.helper}>
-        <Float enabled={sphere.float} speed={5} floatIntensity={3}>
+      <ambientLight intensity={2} />
+      <directionalLight position={[1, 2, 3]} intensity={2} castShadow />
+
+      <PivotControls depthTest={false} visible={sphere["Helper"]}>
+        <Float enabled={sphere.Float} speed={5} floatIntensity={3}>
           <mesh
             ref={sphereRef}
-            visible={sphere.visible}
-            scale={sphere.scale}
+            visible={sphere.Visible}
+            scale={sphere.Scale}
             position-y={0}
-            onPointerOver={onPointerOverSphere}
-            onPointerOut={onPointerOutSphere}
+            castShadow
+            onPointerOver={() => changeSphereColor("purple")}
+            onPointerOut={() => changeSphereColor("yellow")}
           >
             <sphereGeometry />
-            <meshStandardMaterial color="#E91242" ref={sphereMaterialRef} />
+            <meshStandardMaterial color="yellow" ref={sphereMaterialRef} />
           </mesh>
         </Float>
       </PivotControls>
 
-      <mesh position-y={-1.4} rotation-x={-Math.PI * 0.5} scale={10}>
+      <mesh
+        position-y={-1.4}
+        rotation-x={-Math.PI * 0.5}
+        scale={10}
+        receiveShadow
+      >
         <planeGeometry />
         <MeshReflectorMaterial
           mirror={0.4}

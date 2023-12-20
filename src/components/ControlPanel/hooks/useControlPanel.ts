@@ -1,7 +1,7 @@
 import { button, buttonGroup, useControls } from "leva";
-import { defaultSettings } from "..";
 import { useCallback } from "react";
 import { PerspectiveCamera } from "three";
+import defaultSettings from "../config/panel.defaults";
 
 export interface ControlPanelHookArgs {
   camera?: PerspectiveCamera;
@@ -14,8 +14,8 @@ export default function useControlPanel({
 }: ControlPanelHookArgs) {
   const resetToDefauts = useCallback(() => {
     setGeneralControls(defaultSettings.general);
-    setSphereControls({ ...defaultSettings.sphere, scale: 1 });
-    setCameraControls({ fov: defaultSettings.camera.fov.value });
+    setSphereControls({ ...defaultSettings.sphere, Scale: 1 });
+    setCameraControls({ FOV: defaultSettings.camera.FOV.value });
     setPlaybackControls(defaultSettings.playback);
     onReset?.();
   }, []);
@@ -35,13 +35,13 @@ export default function useControlPanel({
     () => ({
       ...defaultSettings.playback,
       playPauseButtonGroup: buttonGroup({
-        label: "play/pause",
+        label: "Controls",
         opts: {
-          play: () => {
-            setPlaybackControls({ isPlaying: true });
+          PLAY: () => {
+            setPlaybackControls({ "Is Playing": true });
           },
-          pause: () => {
-            setPlaybackControls({ isPlaying: false });
+          PAUSE: () => {
+            setPlaybackControls({ "Is Playing": false });
           },
         },
       }),
@@ -49,8 +49,8 @@ export default function useControlPanel({
   );
 
   const [cameraControls, setCameraControls] = useControls("Camera", () => ({
-    fov: {
-      ...defaultSettings.camera.fov,
+    FOV: {
+      ...defaultSettings.camera.FOV,
       onChange: (value) => {
         if (camera) {
           camera.fov = value;

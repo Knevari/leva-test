@@ -1,13 +1,16 @@
-import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
+import { Canvas } from "@react-three/fiber";
 import { ControlPanel } from "./components/ControlPanel";
+
+import levaTheme from "./config/levaTheme";
 
 function App() {
   return (
     <>
-      <Leva />
+      <Leva theme={levaTheme} hideCopyButton />
       <Canvas
         dpr={[1, 2]}
+        shadows
         camera={{
           fov: 45,
           near: 0.1,
