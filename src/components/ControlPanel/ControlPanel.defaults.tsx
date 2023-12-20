@@ -4,24 +4,30 @@ const general = {
 };
 
 const sphere = {
-  position: {
-    value: {
-      x: 0,
-      y: 0,
-    },
-    joystick: "invertY",
-    step: 0.1,
-  },
   scale: {
     value: 1,
     min: 0,
     max: 5,
     step: 1,
   },
+  helper: false,
   visible: true,
+  float: false,
+  changeOnHover: true,
+};
+
+const playback = {
+  currentFrame: 0,
+  maxFrames: 100,
+};
+
+const camera = {
+  fov: { value: 45, min: 15, max: 150, step: 1 },
 };
 
 export const defaultSettings = {
   general,
   sphere,
+  playback,
+  camera,
 };

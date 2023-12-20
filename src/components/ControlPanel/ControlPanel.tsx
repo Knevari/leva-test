@@ -1,27 +1,36 @@
-import { MeshReflectorMaterial, OrbitControls, Text } from "@react-three/drei";
-import { button, useControls } from "leva";
-import { defaultSettings } from "./ControlPanel.defaults";
+import {
+  Float,
+  MeshReflectorMaterial,
+  OrbitControls,
+  PivotControls,
+  Text,
+} from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
+import useControlPanel from "./hooks/useControlPanel";
+import { Color, MeshStandardMaterial, PerspectiveCamera } from "three";
+import { useRef } from "react";
 
 export function ControlPanel() {
-  const [generalControls, setGeneralControls] = useControls(() => ({
-    Reset: button(() => {
-      setGeneralControls(defaultSettings.general);
-      setSphereControls({
-        scale: defaultSettings.sphere.scale.value,
-        position: {
-          x: defaultSettings.sphere.position.value.x,
-          y: defaultSettings.sphere.position.value.y,
-        },
-        visible: defaultSettings.sphere.visible,
-      });
-    }),
-    ...defaultSettings.general,
-  }));
+  const three = useThree();
+  const sphereMaterialRef = useRef<MeshStandardMaterial>(null);
 
-  const [sphereControls, setSphereControls] = useControls(
-    "Sphere",
-    () => defaultSettings.sphere
-  );
+  const {
+    controls: { general, sphere, playback, camera },
+  } = useControlPanel({
+    camera: three.camera as PerspectiveCamera,
+  });
+
+  // useFrame((state, delta) => {});
+
+  const onPointerOverSphere = () => {
+    if (!sphereMaterialRef.current || !sphere.changeOnHover) return;
+    sphereMaterialRef.current.color = new Color("#FD1193");
+  };
+
+  const onPointerOutSphere = () => {
+    if (!sphereMaterialRef.current || !sphere.changeOnHover) return;
+    sphereMaterialRef.current.color = new Color("#E91242");
+  };
 
   return (
     <>
@@ -30,20 +39,26 @@ export function ControlPanel() {
       <ambientLight intensity={2} />
       <pointLight position={[1, 2, 3]} intensity={4.5} />
 
-      <mesh
-        position={[sphereControls.position.x, sphereControls.position.y, 0]}
-        visible={sphereControls.visible}
-        scale={sphereControls.scale}
-      >
-        <sphereGeometry />
-        <meshStandardMaterial color="red" />
-      </mesh>
+      <PivotControls depthTest={false} visible={sphere.helper}>
+        <Float enabled={sphere.float} speed={5} floatIntensity={3}>
+          <mesh
+            visible={sphere.visible}
+            scale={sphere.scale}
+            position-y={0}
+            onPointerOver={onPointerOverSphere}
+            onPointerOut={onPointerOutSphere}
+          >
+            <sphereGeometry />
+            <meshStandardMaterial color="#E91242" ref={sphereMaterialRef} />
+          </mesh>
+        </Float>
+      </PivotControls>
 
-      <mesh position-y={-1} rotation-x={-Math.PI * 0.5} scale={10}>
+      <mesh position-y={-1.4} rotation-x={-Math.PI * 0.5} scale={10}>
         <planeGeometry />
         <MeshReflectorMaterial
           mirror={0.4}
-          color={generalControls["Theme Color"]}
+          color={general["Theme Color"]}
           blur={[1000, 1000]}
           mixBlur={1}
         />
@@ -54,9 +69,9 @@ export function ControlPanel() {
         maxWidth={3}
         textAlign="center"
         position={[0, 2, -5]}
-        color={generalControls["Theme Color"]}
+        color={general["Theme Color"]}
       >
-        {generalControls["Heading"]}
+        {general["Heading"]}
       </Text>
     </>
   );
