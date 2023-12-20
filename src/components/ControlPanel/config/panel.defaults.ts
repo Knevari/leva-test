@@ -7,10 +7,32 @@ const general = {
 
 const sphere = {
   Scale: {
-    value: 1,
+    value: {
+      x: 1,
+      y: 1,
+      z: 1,
+    },
     min: 0,
     max: 5,
-    step: 1,
+    step: 0.01,
+  },
+  Position: {
+    value: {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    step: 0.01,
+  },
+  Rotation: {
+    value: {
+      x: 1,
+      y: 1,
+      z: 1,
+    },
+    min: 0,
+    max: 5,
+    step: 0.01,
   },
   Helper: false,
   Visible: true,

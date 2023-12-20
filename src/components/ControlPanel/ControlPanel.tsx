@@ -15,6 +15,7 @@ import useControlPanel from "./hooks/useControlPanel";
 
 export function ControlPanel() {
   const { camera } = useThree();
+
   const sphereRef = useRef<Mesh>(null);
   const sphereMaterialRef = useRef<MeshStandardMaterial>(null);
 
@@ -56,8 +57,9 @@ export function ControlPanel() {
           <mesh
             ref={sphereRef}
             visible={sphere.Visible}
-            scale={sphere.Scale}
-            position-y={0}
+            rotation={[sphere.Rotation.x, sphere.Rotation.y, sphere.Rotation.z]}
+            scale={[sphere.Scale.x, sphere.Scale.y, sphere.Scale.z]}
+            position={[sphere.Position.x, sphere.Position.y, sphere.Position.z]}
             castShadow
             onPointerOver={() => changeSphereColor("purple")}
             onPointerOut={() => changeSphereColor("yellow")}

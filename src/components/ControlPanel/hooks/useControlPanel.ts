@@ -14,7 +14,12 @@ export default function useControlPanel({
 }: ControlPanelHookArgs) {
   const resetToDefauts = useCallback(() => {
     setGeneralControls(defaultSettings.general);
-    setSphereControls({ ...defaultSettings.sphere, Scale: 1 });
+    setSphereControls({
+      ...defaultSettings.sphere,
+      Scale: defaultSettings.sphere.Scale.value,
+      Rotation: defaultSettings.sphere.Rotation.value,
+      Position: defaultSettings.sphere.Rotation.value,
+    });
     setCameraControls({ FOV: defaultSettings.camera.FOV.value });
     setPlaybackControls(defaultSettings.playback);
     onReset?.();
